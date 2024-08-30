@@ -93,13 +93,18 @@ import { getCateParams } from "/@/api/biz/cate";
 interface TableDataRow {
   id: number;
   name: string;
-  cateId: number;
+  cateId: number | null;
   isEnable: string;
   summary: string;
   content: string;
   logo: string;
   createdAt: string;
 }
+interface CateRow {
+  id: number;
+  name: string;
+}
+
 interface TableDataState {
   ids: number[];
   tableData: {
@@ -110,10 +115,11 @@ interface TableDataState {
       pageNum: number;
       pageSize: number;
       keyword: string;
-      cateId: number;
+      cateId: number | null;
       isEnable: string;
     };
   };
+  cates: Array<CateRow>
 }
 
 export default defineComponent({
@@ -134,7 +140,7 @@ export default defineComponent({
           pageSize: 10,
           keyword: '',
           isEnable: '',
-          cateId: '',
+          cateId: null,
         },
       },
       cates: [],
@@ -164,7 +170,7 @@ export default defineComponent({
       EditTemplateRef.value.openDialog(row);
     };
     // 删除
-    const onRowDel = (row: TableDataRow) => {
+    const onRowDel = (row: TableDataRow | null) => {
       let msg = '你确定要删除所选数据？';
       let ids: number[] = [];
       if (row) {

@@ -87,7 +87,7 @@ export default defineComponent({
       EditCateRef.value.openDialog(row);
     };
     // 删除
-    const onRowDel = (row: TableDataRow) => {
+    const onRowDel = (row: TableDataRow | null) => {
       let msg = '你确定要删除所选数据？';
       let ids: number[] = [];
       if (row) {
