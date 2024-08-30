@@ -63,13 +63,17 @@ import { getToken } from "/@/utils/gfast"
 import { getCateParams } from "/@/api/biz/cate";
 // import { Plus } from '@element-plus/icons-vue'
 
+interface CateRow {
+  id: number;
+  name: string;
+}
 
 interface RuleFormState {
   id: number;
   name: string;
   summary: string;
   logo: string;
-  cateId: number;
+  cateId: number | null;
   content: string;
   introduction: string;
   isEnable: string;
@@ -77,7 +81,8 @@ interface RuleFormState {
 interface DicState {
   isShowDialog: boolean;
   ruleForm: RuleFormState;
-  rules: {}
+  rules: {};
+  cates: Array<CateRow> | null
 }
 
 export default defineComponent({
@@ -90,7 +95,7 @@ export default defineComponent({
 
     // Codemirror EditorView instance ref
     const view = shallowRef()
-    const handleReady = (payload) => {
+    const handleReady = (payload: { view: any; }) => {
       view.value = payload.view
     }
 
@@ -99,14 +104,14 @@ export default defineComponent({
     const baseURL: string | undefined | boolean = import.meta.env.VITE_API_URL
     const maxSize = 1024 * 1024
     const state = reactive<DicState>({
-      cates: [],
+      cates: null,
       isShowDialog: false,
       ruleForm: {
         id: 0,
         name: '',
         summary: '',
         logo: '',
-        cateId: '',
+        cateId: null,
         content: '',
         introduction: '',
         isEnable: ''
@@ -134,7 +139,7 @@ export default defineComponent({
 
     });
     const cateList = () => {
-      getCateParams().then((res: any) => {
+      getCateParams({}).then((res: any) => {
         state.cates = res.data.cates;
       });
     };
@@ -162,7 +167,7 @@ export default defineComponent({
         name: '',
         summary: '',
         logo: '',
-        cateId: '',
+        cateId: null,
         content: '',
         introduction: '',
         isEnable: ''
