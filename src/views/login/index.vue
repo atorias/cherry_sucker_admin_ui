@@ -31,7 +31,7 @@
       <div class="login-footer-content mt15">
         <div class="login-footer-content-warp">
           <div>Copyright © 2021-2023 g-fast.cn All Rights Reserved.</div>
-          <div class="mt5">云南奇讯科技有限公司版权所有</div>
+          <div class="mt5">demilich</div>
         </div>
       </div>
     </div>
