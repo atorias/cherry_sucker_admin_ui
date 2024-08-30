@@ -6,26 +6,23 @@
         <el-card shadow="hover" header="个人信息">
           <div class="personal-user">
             <div class="personal-user-left">
-              <el-upload
-                  class=" h100 personal-user-left-upload avatar-uploader"
-                  :action="baseURL+'/api/v1/system/upload/singleImg'"
-                  :show-file-list="false"
-                  :on-success="handleAvatarSuccess"
-                  :data="dataParam"
-              >
+              <el-upload class=" h100 personal-user-left-upload avatar-uploader"
+                :action="baseURL + '/api/v1/system/file/upload'" :show-file-list="false" :on-success="handleAvatarSuccess"
+                :data="dataParam">
                 <img v-if="imageUrl" :src="proxy.getUpFileUrl(imageUrl)" class="avatar" />
-                <el-icon v-else class="avatar-uploader-icon"><ele-Plus  /></el-icon>
+                <el-icon v-else class="avatar-uploader-icon"><ele-Plus /></el-icon>
 
               </el-upload>
             </div>
             <div class="personal-user-right">
               <el-row>
-                <el-col :span="24" class="personal-title mb18">{{ currentTime }}，{{ personalForm.nickname }}，{{ personalForm.describe }}！ </el-col>
+                <el-col :span="24" class="personal-title mb18">{{ currentTime }}，{{ personalForm.nickname }}，{{
+                  personalForm.describe }}！ </el-col>
                 <el-col :span="24">
                   <el-row>
                     <el-col :xs="24" :sm="8" class="personal-item mb6">
                       <div class="personal-item-label">昵称：</div>
-                      <div class="personal-item-value">	{{ personalForm.nickname }}</div>
+                      <div class="personal-item-value"> {{ personalForm.nickname }}</div>
                     </el-col>
                     <el-col :xs="24" :sm="16" class="personal-item mb6">
                       <div class="personal-item-label">联系电话：</div>
@@ -37,11 +34,11 @@
                   <el-row>
                     <el-col :xs="24" :sm="8" class="personal-item mb6">
                       <div class="personal-item-label">登录IP：</div>
-                      <div class="personal-item-value">{{personalForm.lastLoginIp}}</div>
+                      <div class="personal-item-value">{{ personalForm.lastLoginIp }}</div>
                     </el-col>
                     <el-col :xs="24" :sm="16" class="personal-item mb6">
                       <div class="personal-item-label">登录时间：</div>
-                      <div class="personal-item-value">{{personalForm.lastLoginTime}}</div>
+                      <div class="personal-item-value">{{ personalForm.lastLoginTime }}</div>
                     </el-col>
                   </el-row>
                 </el-col>
@@ -142,7 +139,7 @@
               </el-col>
               <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                 <el-form-item>
-                  <el-button type="primary"  @click="handleUpload">
+                  <el-button type="primary" @click="handleUpload">
                     <el-icon>
                       <ele-Position />
                     </el-icon>
@@ -204,20 +201,20 @@
 </template>
 
 <script lang="ts">
-import { toRefs, reactive, computed, defineComponent,getCurrentInstance,onMounted } from 'vue';
+import { toRefs, reactive, computed, defineComponent, getCurrentInstance, onMounted } from 'vue';
 import { formatAxis } from '/@/utils/formatTime';
 import { storeToRefs } from 'pinia';
 import { useUserInfo } from '/@/stores/userInfo';
-import {getPersonalInfo, editPersonal, resetPwdPersonal} from "/@/api/system/personal";
+import { getPersonalInfo, editPersonal, resetPwdPersonal } from "/@/api/system/personal";
 import type { UploadProps } from 'element-plus'
-import {ElMessage} from "element-plus";
-import {ElMessageBox} from 'element-plus'
-import {getToken} from "/@/utils/gfast"
+import { ElMessage } from "element-plus";
+import { ElMessageBox } from 'element-plus'
+import { getToken } from "/@/utils/gfast"
 import { newsInfoList, recommendList } from './mock';
-import {Session} from "/@/utils/storage";
+import { Session } from "/@/utils/storage";
 // 定义接口来定义对象的类型
 interface PersonalState {
-  imageUrl:'',
+  imageUrl: '',
   deptName: '';
   roles: [];
   personalForm: any;
@@ -228,44 +225,46 @@ interface PersonalState {
 export default defineComponent({
   name: 'personals',
   setup() {
-    const baseURL:string|undefined|boolean = import.meta.env.VITE_API_URL
-    const {proxy} = <any>getCurrentInstance();
+    const baseURL: string | undefined | boolean = import.meta.env.VITE_API_URL
+    const { proxy } = <any>getCurrentInstance();
     const stores = useUserInfo();
     const { userInfos } = storeToRefs(stores);
     const dataParam = reactive({
-      token:getToken(),
+      token: getToken(),
+      AllowedTypes: JSON.stringify(['jpg', 'jpeg', 'png', 'jfif']),
+      MaxSize: 1024 * 1024,
     })
     const state = reactive<PersonalState>({
       newsInfoList,
       recommendList,
-      imageUrl:'',
-      deptName:'',
-      roles:[],
+      imageUrl: '',
+      deptName: '',
+      roles: [],
       personalForm: {
         nickname: '',
         userEmail: '',
         describe: '',
         mobile: '',
         sex: '',
-        remark:'',
-        avatar:'',
-        lastLoginIp:'',
-        lastLoginTime:''
+        remark: '',
+        avatar: '',
+        lastLoginIp: '',
+        lastLoginTime: ''
       },
     });
 
     // const  handleUpload =
     const handleUpload = () => {
       // console.log(state.personalForm)
-      editPersonal(state.personalForm).then((res:any)=>{
-          const userInfo = res.data.userInfo
-          userInfo.avatar = proxy.getUpFileUrl(userInfo.avatar)
-          // 存储 token 到浏览器缓存
-          Session.set('token', res.data.token);
-          // 存储用户信息到浏览器缓存
-          Session.set('userInfo', userInfo);
-          useUserInfo().setUserInfos();
-          ElMessage.success('已更新');
+      editPersonal(state.personalForm).then((res: any) => {
+        const userInfo = res.data.userInfo
+        userInfo.avatar = proxy.getUpFileUrl(userInfo.avatar)
+        // 存储 token 到浏览器缓存
+        Session.set('token', res.data.token);
+        // 存储用户信息到浏览器缓存
+        Session.set('userInfo', userInfo);
+        useUserInfo().setUserInfos();
+        ElMessage.success('已更新');
       });
     };
     // 当前时间提示语
@@ -274,47 +273,47 @@ export default defineComponent({
       return formatAxis(new Date());
     });
     const handleAvatarSuccess: UploadProps['onSuccess'] = (
-        response,
-        uploadFile
+      response,
     ) => {
-       if(response.code == 0){
-          state.imageUrl = response.data.path;
-          state.personalForm.avatar = response.data.path;
-         handleUpload();
-       }
-
+      if (response.code == 0) {
+        state.imageUrl = response.data.file[0].url;
+        state.personalForm.avatar = response.data.file[0].url;
+        handleUpload();
+      } else {
+        ElMessage.error(response.msg);
+      }
     };
 
     /** 重置密码按钮操作 */
-    const handleEditPass = ()=> {
+    const handleEditPass = () => {
       ElMessageBox.prompt('请输入"' + state.personalForm.nickname + '"的新密码', "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消"
       }).then(({ value }) => {
-        if(!value || value==''){
+        if (!value || value == '') {
           ElMessage.success('密码不能为空');
           return
         }
-        resetPwdPersonal({password:value}).then(() => {
+        resetPwdPersonal({ password: value }).then(() => {
           ElMessage.success("修改成功，新密码是：" + value);
         });
-      }).catch(() => {});
+      }).catch(() => { });
     };
     // 初始化用户数据
     const initUserInfo = () => {
-      getPersonalInfo().then((res:any)=>{
+      getPersonalInfo().then((res: any) => {
         const user = res.data.user;
         state.imageUrl = user.avatar;
         state.personalForm = {
-          nickname:user.userNickname,
-          userEmail:user.userEmail,
+          nickname: user.userNickname,
+          userEmail: user.userEmail,
           describe: user.describe,
           mobile: user.mobile,
           sex: String(user.sex),
-          remark:user.remark,
-          avatar:user.avatar,
-          lastLoginIp:user.lastLoginIp,
-          lastLoginTime:user.lastLoginTime
+          remark: user.remark,
+          avatar: user.avatar,
+          lastLoginIp: user.lastLoginIp,
+          lastLoginTime: user.lastLoginTime
         }
         state.deptName = res.data.deptName;
         state.roles = res.data.roles;
@@ -342,19 +341,23 @@ export default defineComponent({
 
 <style scoped lang="scss">
 @import '../../../theme/mixins/index.scss';
+
 .personal {
   .personal-user {
     height: 130px;
     display: flex;
     align-items: center;
+
     .personal-user-left {
       width: 130px;
       height: 130px;
       border-radius: 3px;
+
       :deep(.el-upload) {
         height: 100%;
       }
-      .avatar-uploader{
+
+      .avatar-uploader {
         border: 1px dashed var(--el-border-color);
         border-radius: 6px;
         cursor: pointer;
@@ -364,12 +367,14 @@ export default defineComponent({
         text-align: center;
         font-size: 20px;
       }
+
       .personal-user-left-upload {
         img {
           width: 100%;
           height: 100%;
           border-radius: 3px;
         }
+
         &:hover {
           img {
             animation: logoAnimation 0.3s ease-in-out;
@@ -377,52 +382,64 @@ export default defineComponent({
         }
       }
     }
+
     .personal-user-right {
       flex: 1;
       padding: 0 15px;
+
       .personal-title {
         font-size: 18px;
         @include text-ellipsis(1);
       }
+
       .personal-item {
         display: flex;
         align-items: center;
         font-size: 13px;
         line-height: 26px;
+
         .personal-item-label {
           color: var(--el-text-color-secondary);
           @include text-ellipsis(1);
         }
+
         .personal-item-value {
           @include text-ellipsis(1);
         }
       }
     }
   }
+
   .personal-info {
     .personal-info-more {
       float: right;
       color: var(--el-text-color-secondary);
       font-size: 13px;
+
       &:hover {
         color: var(--el-color-primary);
         cursor: pointer;
       }
     }
+
     .personal-info-box {
       height: 130px;
       overflow: hidden;
+
       .personal-info-ul {
         list-style: none;
+
         .personal-info-li {
           font-size: 13px;
           padding-bottom: 10px;
+
           .personal-info-li-title {
             display: inline-block;
             @include text-ellipsis(1);
             color: var(--el-text-color-secondary);
             text-decoration: none;
           }
+
           & a:hover {
             color: var(--el-color-primary);
             cursor: pointer;
@@ -431,6 +448,7 @@ export default defineComponent({
       }
     }
   }
+
   .personal-recommend-row {
     .personal-recommend-col {
       .personal-recommend {
@@ -439,6 +457,7 @@ export default defineComponent({
         border-radius: 3px;
         overflow: hidden;
         cursor: pointer;
+
         &:hover {
           i {
             right: 0px !important;
@@ -446,6 +465,7 @@ export default defineComponent({
             transition: all ease 0.3s;
           }
         }
+
         i {
           position: absolute;
           right: -10px;
@@ -454,12 +474,14 @@ export default defineComponent({
           transform: rotate(-30deg);
           transition: all ease 0.3s;
         }
+
         .personal-recommend-auto {
           padding: 15px;
           position: absolute;
           left: 0;
           top: 5%;
           color: var(--next-color-white);
+
           .personal-recommend-msg {
             font-size: 12px;
             margin-top: 10px;
@@ -468,11 +490,13 @@ export default defineComponent({
       }
     }
   }
+
   .personal-edit {
     .personal-edit-title {
       position: relative;
       padding-left: 10px;
       color: var(--el-text-color-regular);
+
       &::after {
         content: '';
         width: 2px;
@@ -484,21 +508,26 @@ export default defineComponent({
         background: var(--el-color-primary);
       }
     }
+
     .personal-edit-safe-box {
       border-bottom: 1px solid var(--el-border-color-light, #ebeef5);
       padding: 15px 0;
+
       .personal-edit-safe-item {
         width: 100%;
         display: flex;
         align-items: center;
         justify-content: space-between;
+
         .personal-edit-safe-item-left {
           flex: 1;
           overflow: hidden;
+
           .personal-edit-safe-item-left-label {
             color: var(--el-text-color-regular);
             margin-bottom: 5px;
           }
+
           .personal-edit-safe-item-left-value {
             color: var(--el-text-color-secondary);
             @include text-ellipsis(1);
@@ -506,6 +535,7 @@ export default defineComponent({
           }
         }
       }
+
       &:last-of-type {
         padding-bottom: 0;
         border-bottom: none;
