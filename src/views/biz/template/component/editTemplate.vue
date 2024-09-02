@@ -35,8 +35,7 @@
         <el-form-item label="模板内容" prop="content">
           <codemirror v-model="ruleForm.content" placeholder="Code goes here..."
             :style="{ height: '800px', width: '600px' }" :autofocus="true" :indent-with-tab="true" :tab-size="2"
-            :extensions="extensions" @ready="handleReady" 
-             />
+            :extensions="extensions" @ready="handleReady" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -209,7 +208,10 @@ export default defineComponent({
     const handleAvatarSuccess: UploadProps['onSuccess'] = (
       response
     ) => {
-
+      if (response.code !== 0) {
+        ElMessage.error(response.msg)
+        return
+      }
       state.ruleForm.logo = response.data.file[0].url
     }
 
