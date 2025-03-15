@@ -53,24 +53,32 @@
         <el-table-column label="ID" align="center" prop="id" width="120" />
         <el-table-column label="名称" align="center" prop="name" :show-overflow-tooltip="true" />
         <el-table-column label="分类" align="center" prop="cate.name" :show-overflow-tooltip="true" />
-        <el-table-column label="简介" align="center" prop="summary" :show-overflow-tooltip="true" />
-        <el-table-column label="详情" align="center" prop="introduction" :show-overflow-tooltip="true" />
+        <el-table-column label="简介" align="center" prop="desc" :show-overflow-tooltip="true" />
         <el-table-column label="logo" align="center" prop="logo" :show-overflow-tooltip="true">
           <template #default="scope">
             <el-image style="width: 40px;" v-if="scope.row.logo" :src="scope.row.logo" alt="string"></el-image>
           </template>
         </el-table-column>
-        <el-table-column prop="isEnable" label="模板状态" show-overflow-tooltip>
+        <el-table-column label="项目截图" align="center" prop="project_screenshots" :show-overflow-tooltip="true">
+          <template #default="scope">
+            <el-image style="width: 40px;" v-if="scope.row.project_screenshots" :src="scope.row.project_screenshots" alt="string"></el-image>
+          </template>
+        </el-table-column>
+        <el-table-column prop="isEnable" label="项目状态" show-overflow-tooltip>
           <template #default="scope">
             <el-tag type="success" v-if="scope.row.isEnable === 'Y'">启用</el-tag>
             <el-tag type="info" v-else>禁用</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="createdAt" label="创建时间" show-overflow-tooltip width="180"></el-table-column>
-        <el-table-column label="操作" width="200">
+        // 1. 修改操作列按钮
+        <el-table-column label="操作" width="280">
           <template #default="scope">
             <el-button size="small" text type="primary" @click="onOpenEdit(scope.row)">修改</el-button>
-            <el-button size="small" text type="primary" @click="onRowDel(scope.row)">删除</el-button>
+            <el-button size="small" text type="danger" @click="onRowDel(scope.row)">删除</el-button>
+            <el-button size="small" text :type="scope.row.isEnable === 'Y' ? 'warning' : 'success'" @click="onChangeStatus(scope.row)">
+              {{ scope.row.isEnable === 'Y' ? '禁用' : '启用' }}
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -85,7 +93,7 @@
 import { toRefs, reactive, onMounted, ref, defineComponent } from 'vue';
 import { ElMessageBox, ElMessage, FormInstance } from 'element-plus';
 import EditTemplate from '/@/views/biz/template/component/editTemplate.vue';
-import { deleteTemplate, getTemplateList } from "/@/api/biz/template";
+import { deleteTemplate, getTemplateList, updateTemplateStatus } from "/@/api/biz/template";
 import { getCateParams } from "/@/api/biz/cate";
 
 
@@ -95,9 +103,10 @@ interface TableDataRow {
   name: string;
   cateId: number | null;
   isEnable: string;
-  summary: string;
+  desc: string;
   content: string;
   logo: string;
+  project_screenshots: string;
   createdAt: string;
 }
 interface CateRow {
@@ -210,6 +219,30 @@ export default defineComponent({
     const handleSelectionChange = (selection: TableDataRow[]) => {
       state.ids = selection.map(item => item.id)
     };
+    // 2. 在 script 中添加状态修改相关代码
+    
+    
+    // 在 setup 中添加状态修改方法
+    const onChangeStatus = (row: TableDataRow) => {
+      const newStatus = row.isEnable === 'Y' ? 'N' : 'Y';
+      const statusText = newStatus === 'Y' ? '启用' : '禁用';
+      
+      ElMessageBox.confirm(
+        `确定要${statusText}该模板吗？`,
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }
+      ).then(() => {
+        updateTemplateStatus({ id: row.id, isEnable: newStatus }).then(() => {
+          ElMessage.success(`${statusText}成功`);
+          dataList();
+        });
+      }).catch(() => {});
+    };
+    
     return {
       addDicRef,
       EditTemplateRef,
@@ -220,8 +253,9 @@ export default defineComponent({
       dataList,
       resetQuery,
       handleSelectionChange,
+      onChangeStatus,
       ...toRefs(state),
     };
-  },
+  }
 });
 </script>

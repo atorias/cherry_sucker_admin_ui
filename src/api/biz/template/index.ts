@@ -16,6 +16,15 @@ export function getTemplate(query:Object) {
     })
 }
 
+// 添加修改状态的 API
+export function updateTemplateStatus(params: any) {
+    return request({
+    url: '/api/v1/system/template/status',
+        method: 'post',
+        data: params,
+    });
+    }
+
 
 export function addTemplate(data:any) {
     return request({
